@@ -1,0 +1,5 @@
+FastSAM/
+data/
+work_dirs/
+show_dirs/
+checkpoints/
