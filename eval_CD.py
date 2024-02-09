@@ -1,9 +1,9 @@
 import os
-import math
+import argparse
 import numpy as np
 from skimage import io, measure
 from scipy import stats
-from metric_tool import get_mIoU
+
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -67,9 +67,20 @@ def calc_TP(pred, label):
     TN = ((~pred) * (~label)).sum()
     return TP, TN, FP, FN
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--gt-dir', 
+                        default='data/levir_cd/test/label/')
+    parser.add_argument('--pred-dir', 
+                        default='work_dirs/eval/Levir_CD/SAM_CD/')
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == '__main__':
-    GT_dir = '/.../levir_CD/label/'
-    pred_dir = '/.../SAM_CD/eval/Levir_CD/SAM_CD/'
+    args = parse_args()
+    GT_dir = args.gt_dir
+    pred_dir = args.pred_dir
       
     info_txt_path = os.path.join(pred_dir, 'info.txt')
     f = open(info_txt_path, 'w+')
@@ -107,7 +118,8 @@ if __name__ == '__main__':
     mIoU = (IoU0+IoU1)/2
     acc = (TP+TN) / (TP+FP+FN+TN+1e-10)
     F1 = stats.hmean([precision, recall])
-    print('Eval results: Acc %.2f, precision %.2f, recall %.2f, F1 %.2f, mIoU %.2f.'%(acc*100, precision*100, recall*100, F1*100, mIoU*100))
-    
-    #Below are the evaluation metrics provided in CTD-Former (https://ieeexplore.ieee.org/document/10139838).
-    mIoU = get_mIoU(2, GTs, preds)
+
+    string = 'Eval results: Acc %.2f, precision %.2f, recall %.2f, F1 %.2f, mIoU %.2f.'%(acc*100, precision*100, recall*100, F1*100, mIoU*100)
+    print(string)
+    f.write(string)
+    f.close()

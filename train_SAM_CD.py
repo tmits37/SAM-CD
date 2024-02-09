@@ -4,10 +4,13 @@ import torch.autograd
 from skimage import io
 from torch import optim
 from tensorboardX import SummaryWriter
+import torch
 from torch.utils.data import DataLoader
 import torch.nn.functional as F
 
-working_path = os.path.abspath('.')
+# working_path = os.path.abspath('.')
+working_path = 'work_dirs'
+os.makedirs(working_path, exist_ok=True)
 
 from utils.loss import LatentSimilarity
 from utils.utils import binary_accuracy as accuracy
@@ -51,6 +54,7 @@ writer = SummaryWriter(args['log_dir'])
 
 
 def main():
+    print(args)
     net = Net()
     #net.load_state_dict(torch.load(args['load_path']), strict=False)
     if args['multi_gpu']:
@@ -109,7 +113,7 @@ def train(train_loader, net, optimizer, val_loader):
 
             labels = labels.cpu().detach().numpy()
             outputs = outputs.cpu().detach()
-            preds = F.sigmoid(outputs).numpy()
+            preds = torch.sigmoid(outputs).numpy()
             acc_curr_meter = AverageMeter()
             for (pred, label) in zip(preds, labels):
                 acc, precision, recall, F1, IoU = accuracy(pred, label)
@@ -169,7 +173,7 @@ def validate(val_loader, net, curr_epoch):
 
         outputs = outputs.cpu().detach()
         labels = labels.cpu().detach().numpy()
-        preds = F.sigmoid(outputs).numpy()
+        preds = torch.sigmoid(outputs).numpy()
         for (pred, label) in zip(preds, labels):
             acc, precision, recall, F1, IoU = accuracy(pred, label)
             F1_meter.update(F1)

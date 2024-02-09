@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import torch.autograd
 from skimage import io
+import torch
 from torch.nn import functional as F
 from torchvision.transforms import functional as transF
 from torch.utils.data import DataLoader
@@ -26,7 +27,9 @@ class PredOptions():
         self.initialized = False
         
     def initialize(self, parser):
-        working_path = os.path.dirname(os.path.abspath(__file__))
+        # working_path = os.path.dirname(os.path.abspath(__file__))
+        working_path = 'work_dirs'
+        os.makedirs(working_path, exist_ok=True)
         parser.add_argument('--crop_size', required=False, default=(1024, 1024), help='cropping size')
         parser.add_argument('--TTA', required=False, default=True, help='Test time augmentation')
         parser.add_argument('--test_dir', required=False, default=os.path.join(Data.root, 'test'), help='directory to test images')
@@ -172,25 +175,25 @@ def predict(net, opt):
                       tensorA = transF.to_tensor(cropA).unsqueeze(0).to(torch.device('cuda', int(opt.dev_id))).float()
                       tensorB = transF.to_tensor(cropB).unsqueeze(0).to(torch.device('cuda', int(opt.dev_id))).float()
                       output, _, _ = net(tensorA, tensorB)
-                      output = F.sigmoid(output)
+                      output = torch.sigmoid(output)
                       if opt.TTA:
                           tensorA_v = torch.flip(tensorA, [2])
                           tensorB_v = torch.flip(tensorB, [2])
                           output_v, _, _ = net(tensorA_v, tensorB_v)
                           output_v = torch.flip(output_v, [2])
-                          output += F.sigmoid(output_v)
+                          output += torch.sigmoid(output_v)
                                       
                           tensorA_h = torch.flip(tensorA, [3])
                           tensorB_h = torch.flip(tensorB, [3])
                           output_h, _, _ = net(tensorA_h, tensorB_h)
                           output_h = torch.flip(output_h, [3])
-                          output += F.sigmoid(output_h)
+                          output += torch.sigmoid(output_h)
                           
                           tensorA_hv = torch.flip(tensorA, [2,3])
                           tensorB_hv = torch.flip(tensorB, [2,3])
                           output_hv, _, _ = net(tensorA_hv, tensorB_hv)
                           output_hv = torch.flip(output_hv, [2,3])
-                          output += F.sigmoid(output_hv)            
+                          output += torch.sigmoid(output_hv)            
                           output = output/4.0
                       pred = output.cpu().detach().numpy().squeeze()>0.5
                       preds.append(pred)
@@ -200,25 +203,25 @@ def predict(net, opt):
                   tensorA = transF.to_tensor(imgA).unsqueeze(0).to(torch.device('cuda', int(opt.dev_id))).float()
                   tensorB = transF.to_tensor(imgB).unsqueeze(0).to(torch.device('cuda', int(opt.dev_id))).float()            
                   output, _, _ = net(tensorA, tensorB)
-                  output = F.sigmoid(output)
+                  output = torch.sigmoid(output)
                   if opt.TTA:
                       tensorA_v = torch.flip(tensorA, [2])
                       tensorB_v = torch.flip(tensorB, [2])
                       output_v, _, _ = net(tensorA_v, tensorB_v)
                       output_v = torch.flip(output_v, [2])
-                      output += F.sigmoid(output_v)
+                      output += torch.sigmoid(output_v)
                                   
                       tensorA_h = torch.flip(tensorA, [3])
                       tensorB_h = torch.flip(tensorB, [3])
                       output_h, _, _ = net(tensorA_h, tensorB_h)
                       output_h = torch.flip(output_h, [3])
-                      output += F.sigmoid(output_h)
+                      output += torch.sigmoid(output_h)
                       
                       tensorA_hv = torch.flip(tensorA, [2,3])
                       tensorB_hv = torch.flip(tensorB, [2,3])
                       output_hv, _, _ = net(tensorA_hv, tensorB_hv)
                       output_hv = torch.flip(output_hv, [2,3])
-                      output += F.sigmoid(output_hv)            
+                      output += torch.sigmoid(output_hv)            
                       output = output/4.0
                   pred = output.cpu().detach().numpy().squeeze()>0.5
         pred_path = os.path.join(opt.pred_dir, it)
