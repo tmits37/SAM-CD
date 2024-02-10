@@ -21,12 +21,12 @@ cp -f utils/paste_these_over_ultralytics/tasks.py $LOCAL_PYTHON_SITEPACKAGES_ROO
 sed -i "s|root = '/YOUR_DATA_ROOT/'|root = '$LOCAL_DATA_ROOT'|g" datasets/Levir_CD.py
 
 # 3. Train
-python3 train_SAM_CD.py
+# python3 train_SAM_CD.py
 
 # 4. Validation
-python3 pred_CD.py --chkpt_path work_dirs/pretrained_weights/LevirCD_SAM_CD_e42_OA99.24_F86.73_IoU79.30.pth
+# python3 pred_CD.py --chkpt_path work_dirs/pretrained_weights/LevirCD_SAM_CD_e42_OA99.24_F86.73_IoU79.30.pth --pred-dir <pred_dir>
 
 # 5. Evaluation
-python3 eval_CD.py
+# python3 eval_CD.py --pred-dir <pred_dir>
 
 
