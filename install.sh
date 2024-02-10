@@ -1,4 +1,4 @@
-# Please Insults following location infos.
+# Please insert the following location information.
 # you can get LOCAL_PYTHON_SITEPACKAGES_ROOT from "python3 -m site"
 LOCAL_PYTHON_SITEPACKAGES_ROOT="/usr/local/lib/python3.8/site-packages"
 LOCAL_DATA_ROOT="/nas/k8s/dev/research/doyoungi/git/SAM-CD/data/levir_cd"
